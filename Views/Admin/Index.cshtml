@@ -1,6 +1,826 @@
 ﻿@{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "StarTickets - Admin Dashboard";
+    Layout = "~/Views/Shared/CustomLayouts/_AdminDashboard.cshtml";
 }
 
-<h2>Welcome to the Admin Dashboard</h2>
-<p>You are logged in as a Admin.</p>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="brand">StarTickets</div>
+    </div>
+
+    <nav class="sidebar-menu">
+        <div class="menu-item">
+            <a href="#" class="menu-link active" data-page="dashboard">
+                <i class="fas fa-tachometer-alt menu-icon"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="users">
+                <i class="fas fa-users menu-icon"></i>
+                <span class="menu-text">User Management</span>
+                <span class="menu-badge">23</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="organizers">
+                <i class="fas fa-user-tie menu-icon"></i>
+                <span class="menu-text">Event Organizers</span>
+                <span class="menu-badge">8</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="events">
+                <i class="fas fa-calendar-alt menu-icon"></i>
+                <span class="menu-text">Events</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="categories">
+                <i class="fas fa-layer-group menu-icon"></i>
+                <span class="menu-text">Categories</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="venues">
+                <i class="fas fa-building menu-icon"></i>
+                <span class="menu-text">Venues</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="bookings">
+                <i class="fas fa-ticket-alt menu-icon"></i>
+                <span class="menu-text">Bookings</span>
+                <span class="menu-badge">12</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="payments">
+                <i class="fas fa-credit-card menu-icon"></i>
+                <span class="menu-text">Payments</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="refunds">
+                <i class="fas fa-undo-alt menu-icon"></i>
+                <span class="menu-text">Refunds</span>
+                <span class="menu-badge">3</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="reports">
+                <i class="fas fa-chart-bar menu-icon"></i>
+                <span class="menu-text">Reports & Analytics</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="promotions">
+                <i class="fas fa-tags menu-icon"></i>
+                <span class="menu-text">Promotions</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="marketing">
+                <i class="fas fa-bullhorn menu-icon"></i>
+                <span class="menu-text">Marketing</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="notifications">
+                <i class="fas fa-bell menu-icon"></i>
+                <span class="menu-text">Notifications</span>
+                <span class="menu-badge">5</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="reviews">
+                <i class="fas fa-star-half-alt menu-icon"></i>
+                <span class="menu-text">Reviews & Ratings</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="support">
+                <i class="fas fa-headset menu-icon"></i>
+                <span class="menu-text">Customer Support</span>
+                <span class="menu-badge">7</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="security">
+                <i class="fas fa-shield-alt menu-icon"></i>
+                <span class="menu-text">Security</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="backups">
+                <i class="fas fa-database menu-icon"></i>
+                <span class="menu-text">Backups</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="logs">
+                <i class="fas fa-list-alt menu-icon"></i>
+                <span class="menu-text">System Logs</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="settings">
+                <i class="fas fa-cog menu-icon"></i>
+                <span class="menu-text">Settings</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="/Account/Logout" class="menu-link" data-page="logout">
+                <i class="fas fa-sign-out-alt menu-icon"></i>
+                <span class="menu-text">Logout</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="topbar">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="topbar-right">
+            <div class="topbar-search">
+                <input type="text" placeholder="Search events, users, bookings...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <div class="position-relative">
+                <i class="fas fa-bell" style="font-size: 18px; color: #6b7280; cursor: pointer;"></i>
+                <div class="notification-dot"></div>
+            </div>
+
+            <div class="user-menu">
+                <div class="user-avatar">SA</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 14px;">Super Admin</div>
+                    <div style="font-size: 12px; color: #6b7280;">admin@startickets.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page-content">
+            <h1 class="page-title">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard Overview
+            </h1>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="#" class="quick-action-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Create Event Organizer
+                </a>
+                <a href="#" class="quick-action-btn success">
+                    <i class="fas fa-building"></i>
+                    Add New Venue
+                </a>
+                <a href="#" class="quick-action-btn warning">
+                    <i class="fas fa-calendar-plus"></i>
+                    Create Event
+                </a>
+                <a href="#" class="quick-action-btn info">
+                    <i class="fas fa-tags"></i>
+                    Manage Promotions
+                </a>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stats-card primary">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="1247">0</div>
+                            <div class="stats-label">Total Users</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +12% from last month
+                            </div>
+                        </div>
+                        <div class="stats-icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card success">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="89">0</div>
+                            <div class="stats-label">Active Events</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +5 this week
+                            </div>
+                        </div>
+                        <div class="stats-icon success">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card warning">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="15642">0</div>
+                            <div class="stats-label">Tickets Sold</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +28% from last month
+                            </div>
+                        </div>
+                        <div class="stats-icon warning">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card info">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="42350">$0</div>
+                            <div class="stats-label">Total Revenue</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +18% from last month
+                            </div>
+                        </div>
+                        <div class="stats-icon info">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Tables Row -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Revenue Chart -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Revenue Analytics
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Recent Activity -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-clock"></i>
+                                Recent Activity
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item d-flex align-items-center mb-3">
+                                    <div class="activity-icon bg-success text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">New Event Organizer</div>
+                                        <small class="text-muted">John Smith registered</small>
+                                        <div class="text-muted" style="font-size: 11px;">2 minutes ago</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item d-flex align-items-center mb-3">
+                                    <div class="activity-icon bg-info text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">New Event Created</div>
+                                        <small class="text-muted">Summer Music Festival</small>
+                                        <div class="text-muted" style="font-size: 11px;">15 minutes ago</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item d-flex align-items-center mb-3">
+                                    <div class="activity-icon bg-warning text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">Tickets Sold</div>
+                                        <small class="text-muted">125 tickets for Rock Concert</small>
+                                        <div class="text-muted" style="font-size: 11px;">1 hour ago</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item d-flex align-items-center">
+                                    <div class="activity-icon bg-danger text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">Event Cancelled</div>
+                                        <small class="text-muted">Jazz Night cancelled</small>
+                                        <div class="text-muted" style="font-size: 11px;">3 hours ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Events Table -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Recent Events
+                    </h3>
+                    <a href="#" class="quick-action-btn">View All Events</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Event Name</th>
+                                    <th>Organizer</th>
+                                    <th>Date & Time</th>
+                                    <th>Venue</th>
+                                    <th>Tickets Sold</th>
+                                    <th>Revenue</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">Art Exhibition Opening</div>
+                                        <small class="text-muted">Cultural</small>
+                                    </td>
+                                    <td>Michael Brown</td>
+                                    <td>
+                                        <div>Sep 5, 2024</div>
+                                        <small class="text-muted">6:00 PM</small>
+                                    </td>
+                                    <td>Art Gallery Downtown</td>
+                                    <td>
+                                        <div>0 / 200</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-warning" style="width: 0%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold">$0</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view"><i class="fas fa-check"></i></button>
+                                            <button class="btn-action btn-delete"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">Summer Music Festival</div>
+                                        <small class="text-muted">Concert</small>
+                                    </td>
+                                    <td>John Smith</td>
+                                    <td>
+                                        <div>July 15, 2024</div>
+                                        <small class="text-muted">8:00 PM</small>
+                                    </td>
+                                    <td>Central Park</td>
+                                    <td>
+                                        <div>1,250 / 2,000</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-success" style="width: 62.5%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-success">$31,250</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">Tech Conference 2024</div>
+                                        <small class="text-muted">Conference</small>
+                                    </td>
+                                    <td>Sarah Johnson</td>
+                                    <td>
+                                        <div>Aug 20, 2024</div>
+                                        <small class="text-muted">9:00 AM</small>
+                                    </td>
+                                    <td>Convention Center</td>
+                                    <td>
+                                        <div>450 / 500</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-info" style="width: 90%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-success">$22,500</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health Row -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-server"></i>
+                                System Health
+                            </h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="h4 text-success">98.5%</div>
+                                    <small class="text-muted">Uptime</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">1.2s</div>
+                                    <small class="text-muted">Avg Response</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-database"></i>
+                                Database Status
+                            </h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="h4 text-warning">2.3GB</div>
+                                    <small class="text-muted">Storage Used</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-success">99.9%</div>
+                                    <small class="text-muted">Availability</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-shield-alt"></i>
+                                Security Status
+                            </h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="h4 text-success">Secure</div>
+                                    <small class="text-muted">SSL Status</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">0</div>
+                                    <small class="text-muted">Threats</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Pages (sample structure for new menu items) -->
+        <div id="organizers-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-user-tie"></i>
+                Event Organizers
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Event organizer management functionality will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="categories-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-layer-group"></i>
+                Event Categories
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Event category management functionality will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="refunds-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-undo-alt"></i>
+                Refund Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Refund processing functionality will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="marketing-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-bullhorn"></i>
+                Marketing & Campaigns
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Marketing campaign management functionality will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviews-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-star-half-alt"></i>
+                Reviews & Ratings
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Event reviews and ratings management will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="support-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-headset"></i>
+                Customer Support
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Customer support ticket management will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="security-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-shield-alt"></i>
+                Security Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Security settings and monitoring will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="backups-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-database"></i>
+                Backup Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Database backup and restore functionality will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="logs-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-list-alt"></i>
+                System Logs
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>System activity logs and monitoring will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other existing pages remain the same... -->
+        <div id="users-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-users"></i>
+                User Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>User management functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Create Event Organizer accounts</li>
+                        <li>Manage user accounts (activate/deactivate)</li>
+                        <li>Reset user passwords</li>
+                        <li>View user activity logs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="events-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-calendar-alt"></i>
+                Event Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Event management functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Create and manage events</li>
+                        <li>Set ticket prices and categories</li>
+                        <li>Event categorization</li>
+                        <li>Event approval workflow</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="venues-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-building"></i>
+                Venue Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Venue management functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Create and manage venue information</li>
+                        <li>Store venue details (location, capacity, facilities)</li>
+                        <li>Associate events with venues</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="bookings-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-ticket-alt"></i>
+                Booking Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Booking management functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>View all bookings</li>
+                        <li>Track booking status</li>
+                        <li>Generate e-tickets</li>
+                        <li>Handle booking cancellations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="payments-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-credit-card"></i>
+                Payment Management
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Payment management functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Configure payment gateway settings</li>
+                        <li>Process payment confirmations</li>
+                        <li>Handle payment failures</li>
+                        <li>Apply promotional discounts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="reports-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-chart-bar"></i>
+                Reports & Analytics
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Reports and analytics functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Generate overall system sales reports</li>
+                        <li>User activity reports</li>
+                        <li>Event performance reports</li>
+                        <li>Real-time monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="promotions-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-tags"></i>
+                Promotions & Loyalty
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Promotions management functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Manage promotional campaigns</li>
+                        <li>Create discount codes</li>
+                        <li>Loyalty points system</li>
+                        <li>Send promotional emails</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="notifications-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-bell"></i>
+                Notifications & Communications
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Notifications management functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Send booking confirmation emails</li>
+                        <li>Event reminder notifications</li>
+                        <li>System notifications</li>
+                        <li>Email templates management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-cog"></i>
+                System Settings
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>System settings functionality will be implemented here...</p>
+                    <p>Features include:</p>
+                    <ul>
+                        <li>Configure system settings</li>
+                        <li>Manage application parameters</li>
+                        <li>Security configurations</li>
+                        <li>Email server settings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

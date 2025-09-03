@@ -22,4 +22,9 @@
     <Folder Include="Repository\Interfaces\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\css\AdminDashboard.css" />
+    <None Include="wwwroot\js\AdminDashboard.js" />
+  </ItemGroup>
+
 </Project>
