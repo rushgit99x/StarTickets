@@ -39,9 +39,9 @@ namespace StarTickets.Models
 
         public int LoyaltyPoints { get; set; } = 0;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 
         [StringLength(255)]
         public string? ResetToken { get; set; }

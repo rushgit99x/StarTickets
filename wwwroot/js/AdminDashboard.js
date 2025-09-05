@@ -12,9 +12,35 @@ sidebarToggle.addEventListener('click', function () {
 const menuLinks = document.querySelectorAll('.menu-link');
 const pages = document.querySelectorAll('.page-content');
 
+//menuLinks.forEach(link => {
+//    link.addEventListener('click', function (e) {
+//        e.preventDefault();
+
+//        // Remove active class from all links
+//        menuLinks.forEach(l => l.classList.remove('active'));
+
+//        // Add active class to clicked link
+//        this.classList.add('active');
+
+//        // Hide all pages
+//        pages.forEach(page => page.style.display = 'none');
+
+//        // Show selected page
+//        const targetPage = this.getAttribute('data-page') + '-page';
+//        const targetElement = document.getElementById(targetPage);
+//        if (targetElement) {
+//            targetElement.style.display = 'block';
+//        }
+//    });
+//});
 menuLinks.forEach(link => {
     link.addEventListener('click', function (e) {
-        e.preventDefault();
+        // if it's an external link, allow redirect
+        if (this.classList.contains("external-link")) {
+            return; // do not prevent default
+        }
+
+        e.preventDefault(); // block only internal (SPA-style) links
 
         // Remove active class from all links
         menuLinks.forEach(l => l.classList.remove('active'));
@@ -33,6 +59,7 @@ menuLinks.forEach(link => {
         }
     });
 });
+
 
 // Counter animation
 function animateCounter(element) {
