@@ -38,7 +38,7 @@ namespace StarTickets.Models
         [StringLength(500)]
         public string? ImageUrl { get; set; }
 
-        public EventStatus Status { get; set; } = EventStatus.Draft;
+        public EventStatus Status { get; set; }
 
         public bool IsActive { get; set; } = true;
 

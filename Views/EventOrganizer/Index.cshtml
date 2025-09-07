@@ -1,6 +1,595 @@
 ﻿@{
-    ViewData["Title"] = "Event Organizer Dashboard";
+    ViewData["Title"] = "StarTickets - Event Organizer Dashboard";
+    Layout = "~/Views/Shared/CustomLayouts/_EventOrganizerDashboard.cshtml";
 }
 
-<h2>Welcome to the Event Organizer Dashboard</h2>
-<p>You are logged in as a Event Organizer.</p>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="brand">StarTickets</div>
+    </div>
+
+    <nav class="sidebar-menu">
+        <div class="menu-item">
+            <a href="#" class="menu-link active" data-page="dashboard">
+                <i class="fas fa-tachometer-alt menu-icon"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="my-events">
+                <i class="fas fa-calendar-check menu-icon"></i>
+                <span class="menu-text">My Events</span>
+                <span class="menu-badge">5</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="create-event">
+                <i class="fas fa-plus-circle menu-icon"></i>
+                <span class="menu-text">Create Event</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="ticket-sales">
+                <i class="fas fa-ticket-alt menu-icon"></i>
+                <span class="menu-text">Ticket Sales</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="revenue">
+                <i class="fas fa-chart-line menu-icon"></i>
+                <span class="menu-text">Revenue Reports</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="analytics">
+                <i class="fas fa-chart-bar menu-icon"></i>
+                <span class="menu-text">Analytics</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="customers">
+                <i class="fas fa-users menu-icon"></i>
+                <span class="menu-text">Customers</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="notifications">
+                <i class="fas fa-bell menu-icon"></i>
+                <span class="menu-text">Notifications</span>
+                <span class="menu-badge">3</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="menu-link" data-page="profile">
+                <i class="fas fa-user-circle menu-icon"></i>
+                <span class="menu-text">Profile</span>
+            </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="/Account/Logout" class="menu-link">
+                <i class="fas fa-sign-out-alt menu-icon"></i>
+                <span class="menu-text">Logout</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="topbar">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="topbar-right">
+            <div class="topbar-search">
+                <input type="text" placeholder="Search events, tickets, customers...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <div class="position-relative">
+                <i class="fas fa-bell" style="font-size: 18px; color: #6b7280; cursor: pointer;"></i>
+                <div class="notification-dot"></div>
+            </div>
+
+            <div class="user-menu">
+                <div class="user-avatar">EO</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 14px;">Event Organizer</div>
+                    <div style="font-size: 12px; color: #6b7280;">organizer@startickets.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page-content">
+            <h1 class="page-title">
+                <i class="fas fa-tachometer-alt"></i>
+                Event Organizer Dashboard
+            </h1>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="#" class="quick-action-btn" data-action="create-event">
+                    <i class="fas fa-plus-circle"></i>
+                    Create New Event
+                </a>
+                <a href="#" class="quick-action-btn success" data-action="my-events">
+                    <i class="fas fa-calendar-check"></i>
+                    Manage Events
+                </a>
+                <a href="#" class="quick-action-btn warning" data-action="ticket-sales">
+                    <i class="fas fa-ticket-alt"></i>
+                    View Sales
+                </a>
+                <a href="#" class="quick-action-btn info" data-action="revenue">
+                    <i class="fas fa-download"></i>
+                    Export Reports
+                </a>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stats-card primary">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="5">0</div>
+                            <div class="stats-label">Active Events</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +2 this month
+                            </div>
+                        </div>
+                        <div class="stats-icon primary">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card success">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="1247">0</div>
+                            <div class="stats-label">Tickets Sold</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +15% from last month
+                            </div>
+                        </div>
+                        <div class="stats-icon success">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card warning">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="18650">$0</div>
+                            <div class="stats-label">Total Revenue</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +22% from last month
+                            </div>
+                        </div>
+                        <div class="stats-icon warning">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card info">
+                    <div class="stats-header">
+                        <div>
+                            <div class="stats-value" data-target="89">0%</div>
+                            <div class="stats-label">Avg. Occupancy</div>
+                            <div class="stats-change positive">
+                                <i class="fas fa-arrow-up"></i> +5% from last month
+                            </div>
+                        </div>
+                        <div class="stats-icon info">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Recent Activity Row -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Revenue Chart -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Revenue Trends (Last 6 Months)
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Recent Notifications -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-bell"></i>
+                                Recent Notifications
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item d-flex align-items-center mb-3">
+                                    <div class="activity-icon bg-success text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">Ticket Sold</div>
+                                        <small class="text-muted">5 tickets sold for Summer Concert</small>
+                                        <div class="text-muted" style="font-size: 11px;">2 minutes ago</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item d-flex align-items-center mb-3">
+                                    <div class="activity-icon bg-info text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">Event Approved</div>
+                                        <small class="text-muted">Jazz Night approved by admin</small>
+                                        <div class="text-muted" style="font-size: 11px;">1 hour ago</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item d-flex align-items-center mb-3">
+                                    <div class="activity-icon bg-warning text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">Low Ticket Sales</div>
+                                        <small class="text-muted">Only 20% sold for Rock Concert</small>
+                                        <div class="text-muted" style="font-size: 11px;">3 hours ago</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item d-flex align-items-center">
+                                    <div class="activity-icon bg-primary text-white rounded-circle p-2 me-3">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="fw-bold">Event Review</div>
+                                        <small class="text-muted">5-star review for Theater Show</small>
+                                        <div class="text-muted" style="font-size: 11px;">1 day ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Events Table -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        My Upcoming Events
+                    </h3>
+                    <a href="#" class="quick-action-btn" data-action="my-events">View All Events</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Event Name</th>
+                                    <th>Date & Time</th>
+                                    <th>Venue</th>
+                                    <th>Tickets Sold</th>
+                                    <th>Revenue</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">Summer Music Festival</div>
+                                        <small class="text-muted">Concert</small>
+                                    </td>
+                                    <td>
+                                        <div>Sep 15, 2025</div>
+                                        <small class="text-muted">7:00 PM</small>
+                                    </td>
+                                    <td>Central Park Arena</td>
+                                    <td>
+                                        <div>850 / 1,200</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-success" style="width: 70.8%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-success">$12,750</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-action btn-edit" title="Edit Event"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action btn-analytics" title="Analytics"><i class="fas fa-chart-bar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">Jazz Night</div>
+                                        <small class="text-muted">Concert</small>
+                                    </td>
+                                    <td>
+                                        <div>Sep 22, 2025</div>
+                                        <small class="text-muted">8:30 PM</small>
+                                    </td>
+                                    <td>Blue Note Club</td>
+                                    <td>
+                                        <div>45 / 150</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-warning" style="width: 30%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-success">$1,350</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-action btn-edit" title="Edit Event"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action btn-analytics" title="Analytics"><i class="fas fa-chart-bar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">Rock Concert</div>
+                                        <small class="text-muted">Concert</small>
+                                    </td>
+                                    <td>
+                                        <div>Oct 5, 2025</div>
+                                        <small class="text-muted">9:00 PM</small>
+                                    </td>
+                                    <td>Stadium Arena</td>
+                                    <td>
+                                        <div>200 / 2,000</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-danger" style="width: 10%"></div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-success">$4,000</td>
+                                    <td><span class="status-badge status-pending">Low Sales</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-action btn-edit" title="Edit Event"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action btn-analytics" title="Analytics"><i class="fas fa-chart-bar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Row -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Sales by Event Category
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-calendar-week"></i>
+                                Weekly Ticket Sales
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="weeklyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Event Page -->
+        <div id="create-event-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-plus-circle"></i>
+                Create New Event
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <form class="event-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Event Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter event name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select class="form-control">
+                                        <option>Concert</option>
+                                        <option>Theatre</option>
+                                        <option>Cultural</option>
+                                        <option>Sports</option>
+                                        <option>Conference</option>
+                                        <option>Workshop</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" rows="4" placeholder="Event description"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Event Date</label>
+                                    <input type="datetime-local" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="datetime-local" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Venue</label>
+                                    <select class="form-control">
+                                        <option>Central Park Arena</option>
+                                        <option>Blue Note Club</option>
+                                        <option>Stadium Arena</option>
+                                        <option>Convention Center</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Band/Performer</label>
+                                    <input type="text" class="form-control" placeholder="Band or performer name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="quick-action-btn success">Create Event</button>
+                            <button type="button" class="quick-action-btn" style="background: #6b7280;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Pages -->
+        <div id="my-events-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-calendar-check"></i>
+                My Events
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Complete event management functionality will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="ticket-sales-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-ticket-alt"></i>
+                Ticket Sales
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Real-time ticket sales tracking will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="revenue-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Revenue Reports
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Revenue reports and export functionality will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="analytics-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-chart-bar"></i>
+                Analytics
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Advanced analytics and insights will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="customers-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-users"></i>
+                Customers
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Customer management and insights will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="notifications-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Notification center will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile-page" class="page-content" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-user-circle"></i>
+                Profile Settings
+            </h1>
+            <div class="dashboard-card">
+                <div class="card-body">
+                    <p>Profile management will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
