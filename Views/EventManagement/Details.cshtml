@@ -15,39 +15,6 @@
                 <a href="@Url.Action("EditForm", new { id = Model.Event.EventId })" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Edit Event
                 </a>
-                @* <div class="dropdown d-inline-block">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-cog"></i> Actions
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <button class="dropdown-item update-status-btn"
-                                    data-event-id="@Model.Event.EventId" data-status="1">
-                                <i class="fas fa-check text-success"></i> Publish Event
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item update-status-btn"
-                                    data-event-id="@Model.Event.EventId" data-status="0">
-                                <i class="fas fa-file-alt text-warning"></i> Move to Draft
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item update-status-btn"
-                                    data-event-id="@Model.Event.EventId" data-status="2">
-                                <i class="fas fa-times text-danger"></i> Cancel Event
-                            </button>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <button class="dropdown-item text-danger delete-event-btn"
-                                    data-event-id="@Model.Event.EventId">
-                                <i class="fas fa-trash"></i> Delete Event
-                            </button>
-                        </li>
-                    </ul>
-                </div> *@
             </div>
         </div>
     </div>
@@ -316,23 +283,6 @@
                            class="btn btn-primary">
                             <i class="fas fa-edit"></i> Edit Event
                         </a>
-
-                        @if (Model.Event.Status == StarTickets.Models.EventStatus.Draft)
-                        {
-                            <button class="btn btn-success update-status-btn"
-                                    data-event-id="@Model.Event.EventId" data-status="1">
-                                <i class="fas fa-check"></i> Publish Event
-                            </button>
-                        }
-
-                        @* @if (Model.Event.Status == StarTickets.Models.EventStatus.Published)
-                        {
-                            <button class="btn btn-warning update-status-btn"
-                                    data-event-id="@Model.Event.EventId" data-status="2">
-                                <i class="fas fa-times"></i> Cancel Event
-                            </button>
-                        } *@
-
                         <a href="#" class="btn btn-info" onclick="window.print()">
                             <i class="fas fa-print"></i> Print Details
                         </a>

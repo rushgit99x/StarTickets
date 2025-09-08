@@ -21,15 +21,16 @@
         </div>
 
         <div class="menu-item">
-            <a href="#" class="menu-link" data-page="my-events">
+            @* <a href="#" class="menu-link" data-page="my-events"> *@
+            <a href="@Url.Action("MyEvents")" class="menu-link" data-page="my-events">
                 <i class="fas fa-calendar-check menu-icon"></i>
                 <span class="menu-text">My Events</span>
-                <span class="menu-badge">5</span>
+                @* <span class="menu-badge">5</span> *@
             </a>
         </div>
 
         <div class="menu-item">
-            <a href="#" class="menu-link" data-page="create-event">
+            <a href="@Url.Action("CreateEvent")" class="menu-link" data-page="create-event">
                 <i class="fas fa-plus-circle menu-icon"></i>
                 <span class="menu-text">Create Event</span>
             </a>
@@ -56,20 +57,20 @@
             </a>
         </div>
 
-        <div class="menu-item">
+        @* <div class="menu-item">
             <a href="#" class="menu-link" data-page="customers">
                 <i class="fas fa-users menu-icon"></i>
                 <span class="menu-text">Customers</span>
             </a>
-        </div>
+        </div> *@
 
-        <div class="menu-item">
+        @* <div class="menu-item">
             <a href="#" class="menu-link" data-page="notifications">
                 <i class="fas fa-bell menu-icon"></i>
                 <span class="menu-text">Notifications</span>
                 <span class="menu-badge">3</span>
             </a>
-        </div>
+        </div> *@
 
         <div class="menu-item">
             <a href="#" class="menu-link" data-page="profile">
@@ -79,7 +80,8 @@
         </div>
 
         <div class="menu-item">
-            <a href="/Account/Logout" class="menu-link">
+            @* <a href="/Account/Logout" class="menu-link"> *@
+            <a href="@Url.Action("Logout")" class="menu-link" data-page="create-event">
                 <i class="fas fa-sign-out-alt menu-icon"></i>
                 <span class="menu-text">Logout</span>
             </a>
