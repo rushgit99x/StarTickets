@@ -1,4 +1,4 @@
-﻿// Models/ViewModels/BookingViewModels.cs
+// Models/ViewModels/BookingViewModels.cs
 using System.ComponentModel.DataAnnotations;
 
 namespace StarTickets.Models.ViewModels
@@ -79,5 +79,31 @@ namespace StarTickets.Models.ViewModels
         public List<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
         public List<Ticket> Tickets { get; set; } = new List<Ticket>();
         public bool CanCancel { get; set; }
+    }
+
+    public class PaymentViewModel
+    {
+        public Booking Booking { get; set; }
+        public Event Event { get; set; }
+        public string StripePublishableKey { get; set; } = string.Empty;
+        public string CheckoutUrl { get; set; } = string.Empty;
+        public decimal TotalAmount { get; set; }
+        public string Currency { get; set; } = "usd";
+    }
+
+    public class PaymentSuccessViewModel
+    {
+        public Booking Booking { get; set; }
+        public Event Event { get; set; }
+        public Payment Payment { get; set; }
+        public string SessionId { get; set; } = string.Empty;
+        public string PaymentIntentId { get; set; } = string.Empty;
+    }
+
+    public class PaymentCancelViewModel
+    {
+        public Booking Booking { get; set; }
+        public Event Event { get; set; }
+        public string Message { get; set; } = "Payment was cancelled. You can try again.";
     }
 }

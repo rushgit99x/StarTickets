@@ -1,4 +1,4 @@
-﻿// Data/ApplicationDbContext.cs
+// Data/ApplicationDbContext.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StarTickets.Models;
@@ -41,6 +41,10 @@ namespace StarTickets.Data
         public DbSet<SystemSetting> SystemSettings { get; set; }
         public DbSet<PaymentGateway> PaymentGateways { get; set; }
         public DbSet<PromotionalCampaign> PromotionalCampaigns { get; set; }
+
+        // Payment
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<PaymentWebhook> PaymentWebhooks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -87,6 +91,11 @@ namespace StarTickets.Data
             modelBuilder.Entity<PromotionalCampaign>(entity =>
             {
                 entity.Property(e => e.DiscountValue).HasColumnType("decimal(10,2)");
+            });
+
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.Property(e => e.Amount).HasColumnType("decimal(10,2)");
             });
 
             // Seed initial data

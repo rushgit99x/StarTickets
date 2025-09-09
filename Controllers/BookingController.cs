@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StarTickets.Data;
 using StarTickets.Filters;
@@ -216,8 +216,9 @@ namespace StarTickets.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["SuccessMessage"] = $"Booking successful! Your booking reference is {booking.BookingReference}";
-                return RedirectToAction("BookingConfirmation", new { bookingId = booking.BookingId });
+                // Redirect to payment instead of confirmation
+                TempData["InfoMessage"] = $"Booking created successfully! Please complete your payment.";
+                return RedirectToAction("Checkout", "Payment", new { bookingId = booking.BookingId });
             }
             catch (Exception ex)
             {
