@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using StarTickets.Data;
 using StarTickets.Models.Configuration;
 using StarTickets.Services;
@@ -25,8 +25,13 @@ builder.Services.AddControllersWithViews();
 // Configure Email Settings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
-// Register Email Service
+// Configure Stripe Settings
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("StripeSettings"));
+
+// Register Services
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IStripeService, StripeService>();
+builder.Services.AddScoped<IPaymentWebhookService, PaymentWebhookService>();
 
 var app = builder.Build();
 

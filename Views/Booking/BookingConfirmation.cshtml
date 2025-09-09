@@ -1,0 +1,300 @@
+@model StarTickets.Models.Booking
+@{
+    ViewData["Title"] = "Booking Confirmation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Confirmation Header -->
+            <div class="text-center mb-4">
+                <div class="confirmation-icon mb-3">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h2 class="text-success">Booking Confirmed!</h2>
+                <p class="lead text-muted">Your tickets are ready. Here are your booking details.</p>
+            </div>
+
+            <!-- Booking Summary Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i>
+                        Booking Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Booking Information</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Booking Reference:</strong> @Model.BookingReference</li>
+                                <li><strong>Booking Date:</strong> @Model.BookingDate.ToString("MMMM dd, yyyy 'at' h:mm tt")</li>
+                                <li><strong>Status:</strong> 
+                                    @if (Model.PaymentStatus == PaymentStatus.Completed)
+                                    {
+                                        <span class="badge bg-success">Paid</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Payment Pending</span>
+                                    }
+                                </li>
+                                <li><strong>Total Amount:</strong> $@Model.TotalAmount.ToString("F2")</li>
+                                @if (Model.DiscountAmount > 0)
+                                {
+                                    <li><strong>Discount:</strong> -$@Model.DiscountAmount.ToString("F2")</li>
+                                }
+                                <li><strong>Final Amount:</strong> $@Model.FinalAmount.ToString("F2")</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Event Information</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Event:</strong> @Model.Event?.EventName</li>
+                                <li><strong>Date:</strong> @Model.Event?.EventDate.ToString("MMMM dd, yyyy")</li>
+                                <li><strong>Time:</strong> @Model.Event?.EventDate.ToString("h:mm tt")</li>
+                                <li><strong>Venue:</strong> @Model.Event?.Venue?.VenueName</li>
+                                <li><strong>Location:</strong> @Model.Event?.Venue?.City, @Model.Event?.Venue?.State</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ticket Details -->
+            @if (Model.BookingDetails?.Any() == true)
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ticket-alt me-2"></i>
+                            Your Tickets
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var detail in Model.BookingDetails)
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <div class="ticket-category">
+                                        <h6 class="text-primary">@detail.TicketCategory?.CategoryName</h6>
+                                        <ul class="list-unstyled">
+                                            <li><strong>Quantity:</strong> @detail.Quantity</li>
+                                            <li><strong>Unit Price:</strong> $@detail.UnitPrice.ToString("F2")</li>
+                                            <li><strong>Subtotal:</strong> $@detail.TotalPrice.ToString("F2")</li>
+                                        </ul>
+                                        
+                                        @if (detail.Tickets?.Any() == true)
+                                        {
+                                            <div class="ticket-numbers">
+                                                <h6 class="text-secondary">Ticket Numbers:</h6>
+                                                <div class="ticket-list">
+                                                    @foreach (var ticket in detail.Tickets)
+                                                    {
+                                                        <span class="badge bg-light text-dark me-1 mb-1">@ticket.TicketNumber</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Payment Information -->
+            @if (Model.PaymentStatus == PaymentStatus.Completed)
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Payment Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><strong>Payment Status:</strong> <span class="badge bg-success">Completed</span></li>
+                                    <li><strong>Payment Method:</strong> @Model.PaymentMethod</li>
+                                    <li><strong>Transaction ID:</strong> @Model.PaymentTransactionId</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><strong>Amount Paid:</strong> $@Model.FinalAmount.ToString("F2")</li>
+                                    <li><strong>Payment Date:</strong> @Model.UpdatedAt.ToString("MMMM dd, yyyy 'at' h:mm tt")</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Payment Required
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-info-circle me-2"></i>Payment Pending</h6>
+                            <p class="mb-3">Your booking has been created but payment is still pending. Please complete your payment to secure your tickets.</p>
+                            <a href="@Url.Action("Checkout", "Payment", new { bookingId = Model.BookingId })" 
+                               class="btn btn-primary">
+                                <i class="fas fa-credit-card me-2"></i>
+                                Complete Payment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Important Information -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Important Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Before the Event</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Confirmation email sent</li>
+                                <li><i class="fas fa-check text-success me-2"></i>E-tickets will be delivered</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Event reminder (24 hours before)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">At the Event</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-mobile-alt text-primary me-2"></i>Bring your mobile device</li>
+                                <li><i class="fas fa-qrcode text-primary me-2"></i>QR codes will be scanned at entry</li>
+                                <li><i class="fas fa-clock text-primary me-2"></i>Arrive 30 minutes early</li>
+                                <li><i class="fas fa-id-card text-primary me-2"></i>Bring valid ID if required</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center">
+                @if (Model.PaymentStatus == PaymentStatus.Completed)
+                {
+                    <button class="btn btn-success btn-lg me-3" onclick="printBooking()">
+                        <i class="fas fa-print me-2"></i>
+                        Print Booking
+                    </button>
+                    <button class="btn btn-primary btn-lg me-3" onclick="emailTickets()">
+                        <i class="fas fa-envelope me-2"></i>
+                        Email Tickets
+                    </button>
+                }
+                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-home me-2"></i>
+                    Back to Home
+                </a>
+            </div>
+
+            <!-- Support Information -->
+            <div class="alert alert-light mt-4">
+                <h6><i class="fas fa-headset me-2"></i>Need Help?</h6>
+                <p class="mb-0">
+                    If you have any questions about your booking or need assistance, 
+                    please contact our support team at 
+                    <a href="mailto:support@startickets.com">support@startickets.com</a> 
+                    or call us at <strong>(555) 123-4567</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function printBooking() {
+            window.print();
+        }
+
+        function emailTickets() {
+            // This would typically trigger an email to be sent
+            alert('Tickets will be sent to your registered email address.');
+        }
+
+        // Auto-refresh payment status if payment is pending
+        @if (Model.PaymentStatus == PaymentStatus.Pending)
+        {
+            <text>
+            setTimeout(function() {
+                location.reload();
+            }, 30000); // Refresh every 30 seconds
+            </text>
+        }
+    </script>
+}
+
+<style>
+    .confirmation-icon {
+        animation: bounceIn 0.6s ease-out;
+    }
+
+    @keyframes bounceIn {
+        0% {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .ticket-category {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        border-left: 4px solid #28a745;
+    }
+
+    .ticket-list {
+        max-height: 100px;
+        overflow-y: auto;
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    @media print {
+        .btn, .alert {
+            display: none !important;
+        }
+        
+        .card {
+            border: 1px solid #000 !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
