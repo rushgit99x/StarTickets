@@ -91,7 +91,8 @@ namespace StarTickets.Controllers
                     {
                         1 => RedirectToAction("Index", "Admin"),
                         2 => RedirectToAction("Index", "EventOrganizer"),
-                        3 => RedirectToAction("Index", "Customer"),
+                        //3 => RedirectToAction("Index", "Customer"),
+                        3 => RedirectToAction("Index", "Home"),
                         _ => RedirectToAction("Login")
                     };
                 }

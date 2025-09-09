@@ -1,17 +1,21 @@
-﻿// Dark Theme Ticket Booking Website JavaScript
-
+﻿// Enhanced Home.js with Backend Integration
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize all functionality
     initHeroSlider();
     initNavigation();
     initEventTabs();
     initAnimations();
-    initCart();
-    initNewsletter();
     initSearch();
+    initNewsletter();
+    initBookingButtons();
+    initCategoryFilters();
 });
 
-// Hero Slider Functionality
+// Global variables
+let currentEvents = [];
+let isLoading = false;
+
+// Hero Slider Functionality (Enhanced)
 function initHeroSlider() {
     const slides = document.querySelectorAll('.hero-slide');
     const dots = document.querySelectorAll('.dot');
@@ -20,32 +24,25 @@ function initHeroSlider() {
     let currentSlide = 0;
     let slideInterval;
 
-    // Function to show specific slide
     function showSlide(index) {
-        // Remove active class from all slides and dots
         slides.forEach(slide => slide.classList.remove('active'));
         dots.forEach(dot => dot.classList.remove('active'));
 
-        // Add active class to current slide and dot
         slides[index].classList.add('active');
         dots[index].classList.add('active');
-
         currentSlide = index;
     }
 
-    // Next slide function
     function nextSlide() {
         currentSlide = (currentSlide + 1) % slides.length;
         showSlide(currentSlide);
     }
 
-    // Previous slide function
     function prevSlide() {
         currentSlide = (currentSlide - 1 + slides.length) % slides.length;
         showSlide(currentSlide);
     }
 
-    // Auto-play functionality
     function startSlideShow() {
         slideInterval = setInterval(nextSlide, 5000);
     }
@@ -67,7 +64,6 @@ function initHeroSlider() {
         startSlideShow();
     });
 
-    // Dot navigation
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             stopSlideShow();
@@ -76,24 +72,21 @@ function initHeroSlider() {
         });
     });
 
-    // Pause on hover
     const heroSection = document.querySelector('.hero');
     if (heroSection) {
         heroSection.addEventListener('mouseenter', stopSlideShow);
         heroSection.addEventListener('mouseleave', startSlideShow);
     }
 
-    // Start the slideshow
     startSlideShow();
 }
 
-// Navigation Functionality
+// Enhanced Navigation
 function initNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
 
-    // Mobile menu toggle
     if (hamburger) {
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
@@ -101,11 +94,10 @@ function initNavigation() {
         });
     }
 
-    // Close mobile menu when clicking on a link
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+            hamburger?.classList.remove('active');
+            navMenu?.classList.remove('active');
         });
     });
 
@@ -115,9 +107,7 @@ function initNavigation() {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
+                target.scrollIntoView({ behavior: 'smooth' });
             }
         });
     });
@@ -126,17 +116,295 @@ function initNavigation() {
     window.addEventListener('scroll', () => {
         const header = document.querySelector('.header');
         if (window.scrollY > 100) {
-            header.classList.add('scrolled');
+            header?.classList.add('scrolled');
         } else {
-            header.classList.remove('scrolled');
+            header?.classList.remove('scrolled');
         }
     });
+}
+
+// Enhanced Search Functionality
+function initSearch() {
+    // Hero search
+    const heroSearchBtn = document.getElementById('hero-search-btn');
+    const heroSearchQuery = document.getElementById('hero-search-query');
+
+    // Navigation search
+    const navSearchBtn = document.getElementById('nav-search-btn');
+    const navSearchInput = document.getElementById('nav-search-input');
+
+    if (heroSearchBtn) {
+        heroSearchBtn.addEventListener('click', performHeroSearch);
+    }
+
+    if (navSearchBtn) {
+        navSearchBtn.addEventListener('click', performNavSearch);
+    }
+
+    if (heroSearchQuery) {
+        heroSearchQuery.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performHeroSearch();
+            }
+        });
+    }
+
+    if (navSearchInput) {
+        navSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performNavSearch();
+            }
+        });
+    }
+}
+
+async function performHeroSearch() {
+    const query = document.getElementById('hero-search-query')?.value || '';
+    const location = document.getElementById('hero-search-location')?.value || '';
+    const categoryId = document.getElementById('hero-search-category')?.value || '';
+    const date = document.getElementById('hero-search-date')?.value || '';
+
+    await searchEvents(query, categoryId, location, date);
+}
+
+async function performNavSearch() {
+    const query = document.getElementById('nav-search-input')?.value || '';
+    await searchEvents(query);
+}
+
+async function searchEvents(query = '', categoryId = '', location = '', date = '') {
+    if (isLoading) return;
+
+    showLoadingSpinner();
+    isLoading = true;
+
+    try {
+        const params = new URLSearchParams();
+        if (query) params.append('query', query);
+        if (categoryId) params.append('categoryId', categoryId);
+        if (location) params.append('location', location);
+        if (date) params.append('date', date);
+
+        const response = await fetch(`${window.serverData.searchUrl}?${params}`);
+        const data = await response.json();
+
+        if (data.success) {
+            displaySearchResults(data.events, query);
+            showNotification(`Found ${data.events.length} events`, 'success');
+        } else {
+            showNotification('Search failed. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Search error:', error);
+        showNotification('Search failed. Please check your connection.', 'error');
+    } finally {
+        hideLoadingSpinner();
+        isLoading = false;
+    }
+}
+
+function displaySearchResults(events, query) {
+    const searchSection = document.getElementById('search-results');
+    const searchTitle = document.getElementById('search-results-title');
+    const searchGrid = document.getElementById('search-results-grid');
+
+    if (!searchSection || !searchGrid) return;
+
+    // Update title
+    if (searchTitle) {
+        searchTitle.textContent = query ?
+            `Search Results for "${query}" (${events.length} events)` :
+            `Search Results (${events.length} events)`;
+    }
+
+    // Clear existing results
+    searchGrid.innerHTML = '';
+
+    if (events.length === 0) {
+        searchGrid.innerHTML = `
+            <div class="no-events">
+                <i class="fas fa-search"></i>
+                <h3>No events found</h3>
+                <p>Try adjusting your search criteria</p>
+            </div>
+        `;
+    } else {
+        // Create event cards
+        events.forEach(event => {
+            const eventCard = createEventCard(event);
+            searchGrid.appendChild(eventCard);
+        });
+    }
+
+    // Show search results section
+    searchSection.style.display = 'block';
+    searchSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+function createEventCard(event) {
+    const card = document.createElement('div');
+    card.className = 'event-card';
+    card.setAttribute('data-event-id', event.id);
+
+    card.innerHTML = `
+        <div class="event-image">
+            <img src="${event.image || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop'}" 
+                 alt="${event.name}" onerror="this.src='https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop'">
+            <div class="event-date">
+                <span class="day">${new Date(event.date).getDate()}</span>
+                <span class="month">${new Date(event.date).toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span>
+            </div>
+            <div class="event-category">${event.category || ''}</div>
+        </div>
+        <div class="event-info">
+            <h3>${event.name}</h3>
+            <p class="event-venue">
+                <i class="fas fa-map-marker-alt"></i> ${event.venue}${event.city ? ', ' + event.city : ''}
+            </p>
+            <p class="event-time">
+                <i class="fas fa-clock"></i> ${event.time}
+            </p>
+            <div class="event-price">
+                <span class="price">From ${event.minPrice}</span>
+                <button class="btn btn-primary book-now-btn" 
+                        data-event-id="${event.id}" 
+                        data-event-name="${event.name}">
+                    Book Now
+                </button>
+            </div>
+        </div>
+    `;
+
+    return card;
+}
+
+// Category Filter Functionality
+function initCategoryFilters() {
+    // Category cards
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const categoryId = card.getAttribute('data-category-id');
+            const categoryName = card.querySelector('h3').textContent;
+            filterByCategory(categoryId, categoryName);
+        });
+    });
+
+    // Dropdown category links
+    const categoryLinks = document.querySelectorAll('[data-category]');
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const categoryId = link.getAttribute('data-category');
+            const categoryName = link.textContent.trim();
+            filterByCategory(categoryId, categoryName);
+        });
+    });
+}
+
+async function filterByCategory(categoryId, categoryName) {
+    if (isLoading) return;
+
+    showLoadingSpinner();
+    isLoading = true;
+
+    try {
+        const response = await fetch(`${window.serverData.categoryUrl}?categoryId=${categoryId}`);
+        const data = await response.json();
+
+        if (data.success) {
+            displaySearchResults(data.events, '');
+            const searchTitle = document.getElementById('search-results-title');
+            if (searchTitle) {
+                searchTitle.textContent = `${categoryName} Events (${data.events.length} events)`;
+            }
+            showNotification(`Found ${data.events.length} ${categoryName.toLowerCase()} events`, 'success');
+        } else {
+            showNotification('Failed to load category events.', 'error');
+        }
+    } catch (error) {
+        console.error('Category filter error:', error);
+        showNotification('Failed to load events. Please try again.', 'error');
+    } finally {
+        hideLoadingSpinner();
+        isLoading = false;
+    }
+}
+
+// Booking Functionality
+function initBookingButtons() {
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('book-now-btn')) {
+            e.preventDefault();
+            const eventId = e.target.getAttribute('data-event-id');
+            const eventName = e.target.getAttribute('data-event-name');
+            handleBooking(eventId, eventName);
+        }
+    });
+}
+
+function handleBooking(eventId, eventName) {
+    if (!window.serverData.isAuthenticated) {
+        showNotification('Please login to book tickets', 'info');
+        setTimeout(() => {
+            window.location.href = window.serverData.bookingUrl;
+        }, 1500);
+        return;
+    }
+
+    // If authenticated, redirect to booking page
+    showNotification(`Redirecting to booking for ${eventName}...`, 'success');
+    setTimeout(() => {
+        window.location.href = `${window.serverData.bookingUrl}?eventId=${eventId}`;
+    }, 1000);
+}
+
+// Enhanced Newsletter Functionality
+function initNewsletter() {
+    const newsletterForm = document.getElementById('newsletter-form');
+    const emailInput = document.getElementById('newsletter-email');
+
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+
+            if (!validateEmail(email)) {
+                showNotification('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(window.serverData.subscribeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `email=${encodeURIComponent(email)}`
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(data.message || 'Successfully subscribed!', 'success');
+                    emailInput.value = '';
+                } else {
+                    showNotification(data.message || 'Subscription failed.', 'error');
+                }
+            } catch (error) {
+                console.error('Newsletter subscription error:', error);
+                showNotification('Subscription failed. Please try again.', 'error');
+            }
+        });
+    }
 }
 
 // Event Tabs Functionality
 function initEventTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
-    const eventCards = document.querySelectorAll('.event-card');
 
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -146,317 +414,30 @@ function initEventTabs() {
             // Add active class to clicked button
             button.classList.add('active');
 
-            // Get the tab type
             const tabType = button.dataset.tab;
-
-            // Filter events based on tab (this would typically connect to backend)
-            filterEvents(tabType);
+            filterEventsByTab(tabType);
         });
     });
-
-    function filterEvents(type) {
-        // This function would typically make an API call to filter events
-        // For demonstration, we'll just add animation effects
-        eventCards.forEach((card, index) => {
-            card.style.animation = 'none';
-            card.offsetHeight; // Trigger reflow
-            card.style.animation = `fadeIn 0.6s ease ${index * 0.1}s both`;
-        });
-
-        // Simulate different event sets (in real app, this would be API data)
-        console.log(`Filtering events by: ${type}`);
-    }
 }
 
-// Cart Functionality
-function initCart() {
-    let cartItems = [];
-    const cartIcon = document.querySelector('.cart-icon');
-    const cartCount = document.querySelector('.cart-count');
-    const bookNowButtons = document.querySelectorAll('.event-card .btn-primary');
+async function filterEventsByTab(tabType) {
+    // This could be enhanced to call different API endpoints
+    // For now, we'll just show a loading animation
+    const eventsGrid = document.getElementById('events-grid');
+    const eventCards = eventsGrid.querySelectorAll('.event-card');
 
-    // Add to cart functionality
-    bookNowButtons.forEach(button => {
-        if (button.textContent.includes('Book Now')) {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                const eventCard = button.closest('.event-card');
-                const eventTitle = eventCard.querySelector('h3').textContent;
-                const eventPrice = eventCard.querySelector('.price').textContent;
-                const eventDate = eventCard.querySelector('.event-date');
-
-                const eventData = {
-                    id: Date.now(), // Simple ID generation
-                    title: eventTitle,
-                    price: eventPrice,
-                    date: eventDate ? eventDate.textContent.replace(/\s+/g, ' ').trim() : 'TBD'
-                };
-
-                addToCart(eventData);
-                showNotification('Event added to cart!', 'success');
-            });
-        }
+    // Add loading animation
+    eventCards.forEach((card, index) => {
+        card.style.animation = 'none';
+        card.offsetHeight; // Trigger reflow
+        card.style.animation = `fadeIn 0.6s ease ${index * 0.1}s both`;
     });
 
-    function addToCart(event) {
-        cartItems.push(event);
-        updateCartCount();
-
-        // Save to session storage
-        try {
-            sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
-        } catch (error) {
-            console.log('Session storage not available, using memory storage');
-        }
-    }
-
-    function updateCartCount() {
-        if (cartCount) {
-            cartCount.textContent = cartItems.length;
-            cartCount.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                cartCount.style.transform = 'scale(1)';
-            }, 200);
-        }
-    }
-
-    // Load cart from session storage on page load
-    function loadCart() {
-        try {
-            const savedCart = sessionStorage.getItem('cartItems');
-            if (savedCart) {
-                cartItems = JSON.parse(savedCart);
-                updateCartCount();
-            }
-        } catch (error) {
-            console.log('Could not load cart from session storage');
-        }
-    }
-
-    loadCart();
-
-    // Cart icon click handler
-    if (cartIcon) {
-        cartIcon.addEventListener('click', () => {
-            showCartModal();
-        });
-    }
-
-    function showCartModal() {
-        // Create and show cart modal
-        const modal = document.createElement('div');
-        modal.className = 'cart-modal';
-        modal.innerHTML = `
-            <div class="cart-modal-content">
-                <div class="cart-header">
-                    <h3>Your Cart (${cartItems.length} items)</h3>
-                    <button class="close-cart">&times;</button>
-                </div>
-                <div class="cart-items">
-                    ${cartItems.length === 0 ?
-                '<p class="empty-cart">Your cart is empty</p>' :
-                cartItems.map(item => `
-                            <div class="cart-item">
-                                <h4>${item.title}</h4>
-                                <p>${item.date}</p>
-                                <span class="item-price">${item.price}</span>
-                                <button class="remove-item" data-id="${item.id}">Remove</button>
-                            </div>
-                        `).join('')
-            }
-                </div>
-                ${cartItems.length > 0 ?
-                '<div class="cart-footer"><button class="btn btn-primary checkout-btn">Proceed to Checkout</button></div>' :
-                ''
-            }
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        // Add modal styles
-        const modalStyles = `
-            .cart-modal {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10000;
-                animation: fadeIn 0.3s ease;
-            }
-            .cart-modal-content {
-                background: var(--bg-card);
-                border-radius: 15px;
-                padding: 30px;
-                max-width: 500px;
-                width: 90%;
-                max-height: 80vh;
-                overflow-y: auto;
-                border: 1px solid var(--border-color);
-            }
-            .cart-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-                padding-bottom: 15px;
-                border-bottom: 1px solid var(--border-color);
-            }
-            .close-cart {
-                background: none;
-                border: none;
-                color: var(--text-primary);
-                font-size: 24px;
-                cursor: pointer;
-            }
-            .cart-item {
-                padding: 15px;
-                border-bottom: 1px solid var(--border-color);
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-            .empty-cart {
-                text-align: center;
-                color: var(--text-secondary);
-                padding: 40px;
-            }
-            .cart-footer {
-                margin-top: 20px;
-                text-align: center;
-            }
-            .remove-item {
-                background: var(--error-color);
-                color: white;
-                border: none;
-                padding: 5px 10px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 12px;
-            }
-        `;
-
-        // Add styles to head
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = modalStyles;
-        document.head.appendChild(styleSheet);
-
-        // Event listeners for modal
-        modal.querySelector('.close-cart').addEventListener('click', () => {
-            document.body.removeChild(modal);
-            document.head.removeChild(styleSheet);
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                document.body.removeChild(modal);
-                document.head.removeChild(styleSheet);
-            }
-        });
-
-        // Remove item functionality
-        modal.querySelectorAll('.remove-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const itemId = parseInt(btn.dataset.id);
-                cartItems = cartItems.filter(item => item.id !== itemId);
-                updateCartCount();
-                document.body.removeChild(modal);
-                document.head.removeChild(styleSheet);
-                showNotification('Item removed from cart', 'info');
-            });
-        });
-
-        // Checkout functionality
-        const checkoutBtn = modal.querySelector('.checkout-btn');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', () => {
-                showNotification('Redirecting to checkout...', 'success');
-                // In a real app, this would redirect to checkout page
-                setTimeout(() => {
-                    document.body.removeChild(modal);
-                    document.head.removeChild(styleSheet);
-                }, 1000);
-            });
-        }
-    }
-}
-
-// Search Functionality
-function initSearch() {
-    const searchInputs = document.querySelectorAll('.search-input, .hero-search input[type="text"]');
-    const searchButtons = document.querySelectorAll('.search-btn, .hero-search .btn-primary');
-
-    searchButtons.forEach((button, index) => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const searchInput = searchInputs[index];
-            if (searchInput && searchInput.value.trim()) {
-                performSearch(searchInput.value.trim());
-            }
-        });
-    });
-
-    searchInputs.forEach(input => {
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (input.value.trim()) {
-                    performSearch(input.value.trim());
-                }
-            }
-        });
-    });
-
-    function performSearch(query) {
-        showNotification(`Searching for "${query}"...`, 'info');
-
-        // Simulate search delay
-        setTimeout(() => {
-            showNotification(`Found results for "${query}"`, 'success');
-            // In a real app, this would redirect to search results page
-        }, 1000);
-
-        console.log('Performing search for:', query);
-    }
-}
-
-// Newsletter Functionality
-function initNewsletter() {
-    const newsletterForm = document.querySelector('.newsletter-form');
-
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const emailInput = newsletterForm.querySelector('input[type="email"]');
-            const email = emailInput.value.trim();
-
-            if (validateEmail(email)) {
-                showNotification('Successfully subscribed to newsletter!', 'success');
-                emailInput.value = '';
-            } else {
-                showNotification('Please enter a valid email address.', 'error');
-            }
-        });
-    }
-
-    function validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
+    showNotification(`Loading ${tabType} events...`, 'info');
 }
 
 // Animation Functionality
 function initAnimations() {
-    // Intersection Observer for scroll animations
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -471,9 +452,8 @@ function initAnimations() {
         });
     }, observerOptions);
 
-    // Observe elements for animation
     const animateElements = document.querySelectorAll(
-        '.category-card, .event-card, .testimonial-card, .promo-banner'
+        '.category-card, .event-card, .promo-banner'
     );
 
     animateElements.forEach(el => {
@@ -485,494 +465,238 @@ function initAnimations() {
         const scrolled = window.pageYOffset;
         const parallax = document.querySelector('.hero-slide.active');
 
-        if (parallax) {
-            const speed = scrolled * 0.5;
+        if (parallax && scrolled < window.innerHeight) {
+            const speed = scrolled * 0.3;
             parallax.style.transform = `translateY(${speed}px)`;
         }
     });
 }
 
 // Utility Functions
+function showLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'flex';
+    }
+}
+
+function hideLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none';
+    }
+}
+
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
 function showNotification(message, type = 'info') {
-    // Create notification element
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        notification.remove();
+    });
+
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
-    notification.textContent = message;
 
-    // Add notification styles
-    const notificationStyles = `
-        .notification {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 10001;
-            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
-            max-width: 300px;
-            word-wrap: break-word;
-        }
-        .notification-success {
-            background: var(--success-color);
-        }
-        .notification-error {
-            background: var(--error-color);
-        }
-        .notification-info {
-            background: var(--primary-color);
-        }
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
-            }
-        }
+    // Add icon based on type
+    const icon = type === 'success' ? 'check-circle' :
+        type === 'error' ? 'exclamation-circle' :
+            type === 'info' ? 'info-circle' : 'bell';
+
+    notification.innerHTML = `
+        <i class="fas fa-${icon}"></i>
+        <span>${message}</span>
     `;
 
-    // Add styles if not already added
+    // Add notification styles if not already present
     if (!document.querySelector('#notification-styles')) {
         const styleSheet = document.createElement('style');
         styleSheet.id = 'notification-styles';
-        styleSheet.textContent = notificationStyles;
+        styleSheet.textContent = `
+            .notification {
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease, fadeOut 0.3s ease 4.7s;
+                max-width: 350px;
+                word-wrap: break-word;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+            .notification-success {
+                background: linear-gradient(135deg, #10b981, #059669);
+            }
+            .notification-error {
+                background: linear-gradient(135deg, #ef4444, #dc2626);
+            }
+            .notification-info {
+                background: linear-gradient(135deg, #3b82f6, #2563eb);
+            }
+            .notification i {
+                font-size: 18px;
+                flex-shrink: 0;
+            }
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes fadeOut {
+                from {
+                    opacity: 1;
+                }
+                to {
+                    opacity: 0;
+                }
+            }
+            
+            /* Loading Spinner Styles */
+            .loading-spinner {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                color: white;
+            }
+            
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 3px solid rgba(255, 255, 255, 0.3);
+                border-top: 3px solid #fff;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 15px;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            /* No Events Styles */
+            .no-events {
+                text-align: center;
+                padding: 60px 20px;
+                color: #6b7280;
+                grid-column: 1 / -1;
+            }
+            
+            .no-events i {
+                font-size: 48px;
+                margin-bottom: 20px;
+                opacity: 0.6;
+            }
+            
+            .no-events h3 {
+                font-size: 24px;
+                margin-bottom: 10px;
+                color: #374151;
+            }
+        `;
         document.head.appendChild(styleSheet);
     }
 
-    // Add to DOM
     document.body.appendChild(notification);
 
-    // Remove after 3 seconds
+    // Remove after 5 seconds
     setTimeout(() => {
         if (document.body.contains(notification)) {
-            document.body.removeChild(notification);
+            notification.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
         }
-    }, 3000);
+    }, 5000);
 }
 
-// Category click handlers
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.category-card')) {
-        const categoryCard = e.target.closest('.category-card');
-        const categoryName = categoryCard.querySelector('h3').textContent;
-        showNotification(`Browsing ${categoryName} events...`, 'info');
-
-        // Add click animation
-        categoryCard.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            categoryCard.style.transform = '';
-        }, 150);
-    }
-});
-
-// Loading state management
-window.addEventListener('load', () => {
-    document.body.classList.add('loaded');
-
-    // Hide loading spinner if present
-    const loader = document.querySelector('.loader');
-    if (loader) {
-        loader.style.display = 'none';
-    }
-});
-
-// Error handling for images
+// Enhanced error handling for images
 document.addEventListener('error', (e) => {
     if (e.target.tagName === 'IMG') {
-        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzc0MTUxIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmaWxsPSIjNmI3MjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtc2l6ZT0iMTQiPkltYWdlIE5vdCBGb3VuZDwvdGV4dD4KPC9zdmc+';
-        e.target.alt = 'Image not found';
+        e.target.src = 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop';
+        e.target.alt = 'Event image';
     }
 }, true);
 
-// Performance optimization: Lazy loading for images
-function initLazyLoading() {
-    const images = document.querySelectorAll('img[data-src]');
-
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.classList.remove('lazy');
-                imageObserver.unobserve(img);
-            }
-        });
-    });
-
-    images.forEach(img => imageObserver.observe(img));
-}
-
-// Theme toggle functionality (optional feature)
-function initThemeToggle() {
-    const themeToggle = document.querySelector('.theme-toggle');
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            const isLight = document.body.classList.contains('light-theme');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            showNotification(`Switched to ${isLight ? 'light' : 'dark'} theme`, 'info');
-        });
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-theme');
-        }
-    }
-}
-
-// Advanced search functionality
-function initAdvancedSearch() {
-    const filterButtons = document.querySelectorAll('[data-filter]');
-    const sortButtons = document.querySelectorAll('[data-sort]');
-    const priceRange = document.querySelector('#price-range');
-    const dateRange = document.querySelector('#date-range');
-
-    filterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const filterType = button.dataset.filter;
-            applyFilter(filterType);
-
-            // Update button states
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-        });
-    });
-
-    sortButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const sortType = button.dataset.sort;
-            applySorting(sortType);
-
-            // Update button states
-            sortButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-        });
-    });
-
-    if (priceRange) {
-        priceRange.addEventListener('change', () => {
-            applyPriceFilter(priceRange.value);
-        });
-    }
-
-    if (dateRange) {
-        dateRange.addEventListener('change', () => {
-            applyDateFilter(dateRange.value);
-        });
-    }
-
-    function applyFilter(filterType) {
-        console.log(`Applying filter: ${filterType}`);
-        // In a real app, this would filter events from API
-        showNotification(`Filtering by ${filterType}`, 'info');
-    }
-
-    function applySorting(sortType) {
-        console.log(`Sorting by: ${sortType}`);
-        // In a real app, this would sort events
-        showNotification(`Sorted by ${sortType}`, 'info');
-    }
-
-    function applyPriceFilter(price) {
-        console.log(`Price filter: ${price}`);
-        showNotification(`Filtering by price: ${price}`, 'info');
-    }
-
-    function applyDateFilter(date) {
-        console.log(`Date filter: ${date}`);
-        showNotification(`Filtering by date: ${date}`, 'info');
-    }
-}
-
-// Social sharing functionality
-function initSocialSharing() {
-    const shareButtons = document.querySelectorAll('.share-btn');
-
-    shareButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const platform = button.dataset.platform;
-            const eventTitle = button.closest('.event-card').querySelector('h3').textContent;
-            shareEvent(platform, eventTitle);
-        });
-    });
-
-    function shareEvent(platform, eventTitle) {
-        const url = encodeURIComponent(window.location.href);
-        const text = encodeURIComponent(`Check out this event: ${eventTitle}`);
-
-        let shareUrl;
-
-        switch (platform) {
-            case 'facebook':
-                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-                break;
-            case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-                break;
-            case 'linkedin':
-                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
-                break;
-            case 'whatsapp':
-                shareUrl = `https://wa.me/?text=${text}%20${url}`;
-                break;
-            default:
-                console.log('Unknown platform');
-                return;
-        }
-
-        // Open share window
-        window.open(shareUrl, 'share', 'width=600,height=400,scrollbars=yes,resizable=yes');
-        showNotification(`Sharing on ${platform}`, 'success');
-    }
-}
-
-// Wishlist functionality
-function initWishlist() {
-    let wishlistItems = [];
-    const wishlistButtons = document.querySelectorAll('.wishlist-btn');
-
-    // Load wishlist from storage
-    try {
-        const savedWishlist = localStorage.getItem('wishlistItems');
-        if (savedWishlist) {
-            wishlistItems = JSON.parse(savedWishlist);
-            updateWishlistUI();
-        }
-    } catch (error) {
-        console.log('Could not load wishlist');
-    }
-
-    wishlistButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const eventCard = button.closest('.event-card');
-            const eventId = eventCard.dataset.eventId || Date.now().toString();
-            const eventTitle = eventCard.querySelector('h3').textContent;
-
-            if (isInWishlist(eventId)) {
-                removeFromWishlist(eventId);
-                showNotification('Removed from wishlist', 'info');
-            } else {
-                addToWishlist({
-                    id: eventId,
-                    title: eventTitle,
-                    image: eventCard.querySelector('img').src
-                });
-                showNotification('Added to wishlist', 'success');
-            }
-
-            updateWishlistUI();
-        });
-    });
-
-    function addToWishlist(event) {
-        if (!isInWishlist(event.id)) {
-            wishlistItems.push(event);
-            saveWishlist();
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    // Escape key to close search results
+    if (e.key === 'Escape') {
+        const searchSection = document.getElementById('search-results');
+        if (searchSection && searchSection.style.display !== 'none') {
+            searchSection.style.display = 'none';
         }
     }
 
-    function removeFromWishlist(eventId) {
-        wishlistItems = wishlistItems.filter(item => item.id !== eventId);
-        saveWishlist();
-    }
-
-    function isInWishlist(eventId) {
-        return wishlistItems.some(item => item.id === eventId);
-    }
-
-    function saveWishlist() {
-        try {
-            localStorage.setItem('wishlistItems', JSON.stringify(wishlistItems));
-        } catch (error) {
-            console.log('Could not save wishlist');
+    // Ctrl/Cmd + K to focus search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('nav-search-input');
+        if (searchInput) {
+            searchInput.focus();
         }
-    }
-
-    function updateWishlistUI() {
-        wishlistButtons.forEach(button => {
-            const eventCard = button.closest('.event-card');
-            const eventId = eventCard.dataset.eventId;
-
-            if (isInWishlist(eventId)) {
-                button.classList.add('active');
-                button.innerHTML = '<i class="fas fa-heart"></i>';
-            } else {
-                button.classList.remove('active');
-                button.innerHTML = '<i class="far fa-heart"></i>';
-            }
-        });
-
-        // Update wishlist counter
-        const wishlistCounter = document.querySelector('.wishlist-count');
-        if (wishlistCounter) {
-            wishlistCounter.textContent = wishlistItems.length;
-        }
-    }
-}
-
-// Keyboard navigation
-function initKeyboardNavigation() {
-    document.addEventListener('keydown', (e) => {
-        // Escape key functionality
-        if (e.key === 'Escape') {
-            // Close any open modals
-            const modals = document.querySelectorAll('.cart-modal, .search-modal');
-            modals.forEach(modal => {
-                if (modal.parentNode) {
-                    modal.parentNode.removeChild(modal);
-                }
-            });
-        }
-
-        // Arrow key navigation for hero slider
-        if (e.key === 'ArrowLeft') {
-            const prevBtn = document.querySelector('.hero-prev');
-            if (prevBtn) prevBtn.click();
-        }
-
-        if (e.key === 'ArrowRight') {
-            const nextBtn = document.querySelector('.hero-next');
-            if (nextBtn) nextBtn.click();
-        }
-
-        // Enter key for focused buttons
-        if (e.key === 'Enter' && e.target.classList.contains('btn')) {
-            e.target.click();
-        }
-    });
-
-    // Focus management for accessibility
-    const focusableElements = document.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-
-    focusableElements.forEach(element => {
-        element.addEventListener('focus', () => {
-            element.classList.add('keyboard-focus');
-        });
-
-        element.addEventListener('blur', () => {
-            element.classList.remove('keyboard-focus');
-        });
-    });
-}
-
-// Touch gestures for mobile
-function initTouchGestures() {
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    const heroSection = document.querySelector('.hero');
-
-    if (heroSection) {
-        heroSection.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        });
-
-        heroSection.addEventListener('touchend', (e) => {
-            const touchEndX = e.changedTouches[0].clientX;
-            const touchEndY = e.changedTouches[0].clientY;
-
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = touchEndY - touchStartY;
-
-            // Horizontal swipe detection
-            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-                if (deltaX > 0) {
-                    // Swipe right - previous slide
-                    const prevBtn = document.querySelector('.hero-prev');
-                    if (prevBtn) prevBtn.click();
-                } else {
-                    // Swipe left - next slide
-                    const nextBtn = document.querySelector('.hero-next');
-                    if (nextBtn) nextBtn.click();
-                }
-            }
-        });
-    }
-}
-
-// Initialize additional features when DOM is ready
-document.addEventListener('DOMContentLoaded', function () {
-    initLazyLoading();
-    initThemeToggle();
-    initAdvancedSearch();
-    initSocialSharing();
-    initWishlist();
-    initKeyboardNavigation();
-    initTouchGestures();
-});
-
-// Page visibility API for performance
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        // Pause animations and timers when page is not visible
-        console.log('Page hidden - pausing animations');
-    } else {
-        // Resume when page becomes visible
-        console.log('Page visible - resuming animations');
     }
 });
 
-// Service Worker registration (for PWA capabilities)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('SW registered: ', registration);
-            })
-            .catch(registrationError => {
-                console.log('SW registration failed: ', registrationError);
-            });
-    });
-}
+// Window load event
+window.addEventListener('load', () => {
+    document.body.classList.add('loaded');
+    hideLoadingSpinner();
 
-// Analytics tracking (placeholder for real analytics)
-function trackEvent(eventName, parameters = {}) {
-    console.log('Tracking event:', eventName, parameters);
-    // In a real app, this would send data to analytics service
-    // Example: gtag('event', eventName, parameters);
-}
-
-// Track important user interactions
-document.addEventListener('click', (e) => {
-    if (e.target.matches('.btn-primary')) {
-        trackEvent('button_click', {
-            button_text: e.target.textContent,
-            page_location: window.location.href
-        });
-    }
-
-    if (e.target.closest('.event-card')) {
-        trackEvent('event_card_click', {
-            event_title: e.target.closest('.event-card').querySelector('h3').textContent
-        });
+    // Check for search parameters in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+        const navSearchInput = document.getElementById('nav-search-input');
+        if (navSearchInput) {
+            navSearchInput.value = searchQuery;
+            performNavSearch();
+        }
     }
 });
 
-// Export functions for potential external use
-window.TicketHub = {
+// Enhanced performance monitoring
+let performanceMetrics = {
+    searchTime: 0,
+    loadTime: 0
+};
+
+function trackPerformance(action, startTime) {
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    performanceMetrics[action] = duration;
+    console.log(`${action} took ${duration.toFixed(2)}ms`);
+}
+
+// Export for external use
+window.StarTickets = {
+    searchEvents,
+    filterByCategory,
     showNotification,
-    trackEvent,
-    addToCart: (event) => console.log('Add to cart:', event),
-    searchEvents: (query) => console.log('Search events:', query)
+    handleBooking
 };
